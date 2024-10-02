@@ -1,7 +1,11 @@
 package com.ftbap.ftbap;
 
+import com.feed_the_beast.ftbquests.quest.Quest;
+import com.feed_the_beast.ftbquests.quest.reward.ItemReward;
+import com.feed_the_beast.ftbquests.quest.reward.Reward;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import net.minecraft.item.ItemStack;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -61,9 +65,14 @@ public class ArchipelagoResourceExporter {
         Map<String, Integer> itemMap = new HashMap<>();
         int id = 0;
         for (Quest quest : questManager.getAllQuests()) {
-            for (String reward : quest.getRewards()) {
-                if (!itemMap.containsKey(reward)) {
-                    itemMap.put(reward, id++);
+            for (Reward reward : quest.getRewards()) {
+                if (reward instanceof ItemReward) {
+                    ItemReward itemReward = (ItemReward) reward;
+                    ItemStack stack = itemReward.getStack();
+                    String itemName = stack.getItem().getRegistryName().toString();
+                    if (!itemMap.containsKey(itemName)) {
+                        itemMap.put(itemName, id++);
+                    }
                 }
             }
         }
@@ -74,7 +83,7 @@ public class ArchipelagoResourceExporter {
         Map<String, Integer> locationMap = new HashMap<>();
         int id = 0;
         for (Quest quest : questManager.getAllQuests()) {
-            locationMap.put(quest.getTitle(), id++);
+            locationMap.put(quest.getDisplayName().getUnformattedText(), id++);
         }
         return locationMap;
     }

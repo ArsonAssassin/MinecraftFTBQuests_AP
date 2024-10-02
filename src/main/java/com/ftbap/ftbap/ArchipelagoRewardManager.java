@@ -1,7 +1,6 @@
 package com.ftbap.ftbap;
 
-import dev.ftb.mods.ftbquests.quest.Quest;
-import dev.ftb.mods.ftbquests.quest.reward.Reward;
+import com.feed_the_beast.ftbquests.quest.Quest;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -15,9 +14,11 @@ import java.util.UUID;
 
 public class ArchipelagoRewardManager {
     private static final Logger LOGGER = LogManager.getLogger();
+    private final ArchipelagoClient archipelagoClient;
     private final Map<UUID, Map<String, ItemStack>> pendingRewards;
 
-    public ArchipelagoRewardManager() {        
+    public ArchipelagoRewardManager(ArchipelagoClient archipelagoClient) {
+        this.archipelagoClient = archipelagoClient;
         this.pendingRewards = new HashMap<>();
     }
 
@@ -57,5 +58,9 @@ public class ArchipelagoRewardManager {
         if (event.player instanceof EntityPlayerMP) {
             grantPendingRewards((EntityPlayerMP) event.player);
         }
+    }
+
+    public void setArchipelagoClient(ArchipelagoClient client) {
+        this.archipelagoClient = client;
     }
 }

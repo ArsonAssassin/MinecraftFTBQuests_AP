@@ -2,13 +2,9 @@ package com.ftbap.ftbap;
 
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
-import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.minecraftforge.fml.event.lifecycle.FMLDedicatedServerSetupEvent;
-import net.minecraftforge.event.server.ServerStartingEvent;
-import net.minecraftforge.event.server.ServerStoppingEvent;
+import net.minecraftforge.fml.common.event.*;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -49,10 +45,12 @@ public class FTBArchipelagoMod {
     public void postInit(FMLPostInitializationEvent event) {
         LOGGER.info("FTB Archipelago Integration: Post-initialization");
     }
+
     @Mod.EventHandler
     public void onServerStarting(FMLServerStartingEvent event) {
         event.registerServerCommand(new CommandFTBAPConnect(this));
     }
+
     @Mod.EventHandler
     public void onServerStarted(FMLServerStartedEvent event) {
         LOGGER.info("FTB Archipelago Integration: Server started, loading quests");
@@ -70,7 +68,6 @@ public class FTBArchipelagoMod {
         }
 
         rewardManager = new ArchipelagoRewardManager();
-
         MinecraftForge.EVENT_BUS.register(rewardManager);
 
         QuestCompletionListener questListener = new QuestCompletionListener(archipelagoClient, rewardManager);
@@ -89,17 +86,14 @@ public class FTBArchipelagoMod {
             archipelagoClient.disconnect();
         }
 
-        archipelagoClient = new ArchipelagoClient(host, port, slot, "FTBQuests");
+        archipelagoClient = new ArchipelagoClient(host, port, slot, "FTBQuests", rewardManager);
         archipelagoClient.connect();
         archipelagoClient.sendConnect();
 
         // You might want to add authentication here using the slot and password
         // This depends on how your ArchipelagoClient is implemented
 
-        // Update the reward manager with the new client
-        rewardManager.setArchipelagoClient(archipelagoClient);
-
-        LOGGER.info("Connected to Archipelago server at {}:{}", host, 38281);
+        LOGGER.info("Connected to Archipelago server at {}:{}", host, port);
     }
 
     @SubscribeEvent

@@ -30,7 +30,7 @@ public class CommandFTBAPConnect extends CommandBase {
             throw new CommandException("Invalid command. Usage: " + getUsage(sender));
         }
 
-        if (args.length != 4) {
+        if (args.length != 5) {  // Changed from 4 to 5 to match the usage
             throw new CommandException("Invalid number of arguments. Usage: " + getUsage(sender));
         }
 
@@ -39,7 +39,7 @@ public class CommandFTBAPConnect extends CommandBase {
         try {
             port = Integer.parseInt(args[2]);
         } catch (NumberFormatException e) {
-            throw new CommandException("Invalid slot number. Must be an integer.");
+            throw new CommandException("Invalid port number. Must be an integer.");
         }
         String slot = args[3];
         String password = args[4];

@@ -1,7 +1,10 @@
 package com.ftbap.ftbap;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -25,9 +28,9 @@ public class ArchipelagoClient {
     private final Gson gson;
     private final BlockingQueue<String> messageQueue;
     private Thread listenerThread;
-    private final RewardManager rewardManager;
+    private final ArchipelagoRewardManager rewardManager;
 
-    public ArchipelagoClient(String host, int port, String playerName, String gameName, RewardManager rewardManager) {
+    public ArchipelagoClient(String host, int port, String playerName, String gameName, ArchipelagoRewardManager rewardManager) {
         this.host = host;
         this.port = port;
         this.playerName = playerName;
@@ -123,9 +126,19 @@ public class ArchipelagoClient {
     }
 
     private void handleReceivedItems(JsonObject receivedItems) {
-        // Process received items
         LOGGER.info("Received items: {}", receivedItems);
-        // Here you would typically grant the items to the player in Minecraft
-        rewardManager.queueRewardFromArchipelago(receivedItems.get("item").getAsString());
+        JsonArray items = receivedItems.getAsJsonArray("items");
+        for (int i = 0; i < items.size(); i++) {
+            JsonObject item = items.get(i).getAsJsonObject();
+            String itemName = item.get("item").getAsString();
+            int player = item.get("player").getAsInt();
+            
+            EntityPlayerMP entityPlayer = FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList().getPlayerByUsername(playerName);
+            if (entityPlayer != null) {
+                rewardManager.queueRewardFromArchipelago(itemName, entityPlayer);
+            } else {
+                LOGGER.warn("Player not found for received item: {}", itemName);
+            }
+        }
     }
 }
